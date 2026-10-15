@@ -1,0 +1,19 @@
+{
+  "books": 40,
+  "members": 10,
+  "loans": 15,
+  "overdue_lines": 3,
+  "open_loans": 12,
+  "max_lines_per_member": 2,
+  "report_rows": 15,
+  "early_clock": "2026-09-29T14:15:00Z",
+  "current_clock": "2026-10-14T14:15:00Z",
+  "passed": true,
+  "old_token_rejected": true,
+  "revisions": {
+    "api": "590a012d533bdaec1df10ea41bdc600b58860d55",
+    "infra": "b4965732a7d53543da9570c67f4d4c0d700aa61a",
+    "tool": "e008321c3327589b55d00015da8874f50a6721e6"
+  },
+  "created_at": "2026-10-15T01:46:45.916Z"
+}
