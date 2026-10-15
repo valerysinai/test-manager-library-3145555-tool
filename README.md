@@ -43,6 +43,7 @@ No hay prórroga: suban avances parciales con commits pequeños durante la prueb
 Read the [pre-code plan](evidence/t-21-plan.md) first. The implementation applies docs decisions
 C-04 (demo), C-06 (trusted HTTPS) and C-07 (measurement) to the existing Laravel API. It does not
 change the product contract. Node.js is a client utility, not an additional application backend.
+See [T-21 evidence and the preserved raw local measurement](evidence/t-21.md) for actual results.
 
 Requirements: Node.js 22–26, Docker with Compose, Git and OpenSSL. There are no npm runtime
 dependencies. The API owns migrations; this tool never connects to PostgreSQL or executes SQL.
