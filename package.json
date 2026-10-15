@@ -1,0 +1,8 @@
+{
+  "name": "manager-library-tool",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "engines": {"node": ">=22 <27"},
+  "scripts": {"test": "node --test tests/*.test.mjs", "demo:early": "node --env-file=.env src/cli.mjs demo-early", "demo:current": "node --env-file=.env src/cli.mjs demo-current", "demo:verify": "node --env-file=.env src/cli.mjs demo-verify", "catalog": "node --env-file=.env src/cli.mjs catalog-load", "benchmark": "node --env-file=.env src/cli.mjs benchmark", "verify": "node scripts/run-isolated.mjs"}
+}
