@@ -18,7 +18,7 @@ test('C-07 retains all 400 measurements, excludes exactly 80 warmups and records
   const report=await benchmark(api,state,reportFile,metadata);assert.equal(count,520);assert.equal(report.complete,true);assert.equal(report.passed,false);assert.equal(report.queries.flatMap(x=>x.samples).length,400);assert.equal(report.queries.flatMap(x=>x.warmups).length,80);assert.equal(report.diagnostic.samples.length,40);assert.equal(peak,10);assert.equal(report.statistics.max_ms,300);assert.equal(readJson(reportFile).queries[0].samples[0].status,503);assert.equal(readJson(reportFile).queries[0].samples[1].elapsed_ms,300);
 });
 test('catalog loading never retries uncertain POST writes and persists the partial failure',async t=>{
-  const dir=temp(t),state=join(dir,'state.json');let posts=0;
-  const api={baseUrl:'https://fixture.invalid/api/v1',async login(){this.issuedAt=new Date().toISOString();},async call(path,options){if(path==='/categories')return {items:categoryNames.map((name,i)=>({id:String(i),name}))};if(options?.method==='POST'){posts++;throw new Error('uncertain result');}return {total:0,items:[]};}};
-  await assert.rejects(catalogLoad(api,state));assert.equal(readJson(state).phase,'failed');assert.equal(posts,1);await assert.rejects(catalogLoad(api,state),{code:'STATE_ALREADY_EXISTS'});assert.equal(posts,1);
+  const dir=temp(t),state=join(dir,'state.json');const posts=[];
+  const api={baseUrl:'https://fixture.invalid/api/v1',async login(){this.issuedAt=new Date().toISOString();},async call(path,options){if(path==='/categories')return {items:categoryNames.map((name,i)=>({id:String(i),name}))};if(options?.method==='POST'){posts.push(options.body.isbn);throw new Error('uncertain result');}return {total:0,items:[]};}};
+  await assert.rejects(catalogLoad(api,state));assert.equal(readJson(state).phase,'failed');assert.equal(posts.length,8);assert.equal(new Set(posts).size,8);await assert.rejects(catalogLoad(api,state),{code:'STATE_ALREADY_EXISTS'});assert.equal(posts.length,8);
 });
