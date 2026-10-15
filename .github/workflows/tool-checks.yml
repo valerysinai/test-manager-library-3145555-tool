@@ -1,0 +1,62 @@
+name: Tool SDD verification
+on:
+  push:
+    branches: [main, 'feature/**']
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: tool-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '24'
+      - name: Unit and trusted HTTPS tests
+        run: npm ci --ignore-scripts && npm test
+      - name: Secret pattern scan and scanner tests
+        run: python3 scripts/check_secrets.py && python3 -m unittest discover -s scripts -p 'test_check_secrets.py'
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          repository: valerysinai/test-manager-library-3145555-api
+          ref: 590a012d533bdaec1df10ea41bdc600b58860d55
+          path: _sources/api
+          persist-credentials: false
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          repository: valerysinai/test-manager-library-3145555-app
+          ref: 47a517d0ebce8526d96e650d1ac9750338dcc8a4
+          path: _sources/app
+          persist-credentials: false
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          repository: valerysinai/test-manager-library-3145555-infra
+          ref: b4965732a7d53543da9570c67f4d4c0d700aa61a
+          path: _sources/infra
+          persist-credentials: false
+      - name: Prepare private local TLS without global trust
+        run: node _sources/infra/scripts/init-local.mjs
+      - name: Isolated C-04 demo and complete C-07 measurement
+        env:
+          TOOL_INFRA_DIR: _sources/infra
+          API_CONTEXT: _sources/api
+          APP_CONTEXT: _sources/app
+        run: npm run verify
+      - name: Preserve safe measurement results even when RNF-1 fails
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: tool-sdd-evidence
+          path: |
+            artifacts/demo-summary.json
+            artifacts/benchmark.json
+          if-no-files-found: ignore
+          retention-days: 7
